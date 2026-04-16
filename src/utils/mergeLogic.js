@@ -1,4 +1,4 @@
-export function applyMerge(grid, row, col) {
+export function applyMerge(grid) {
   let newGrid = grid.map(r => [...r]);
   let scoreGained = 0;
 
@@ -28,34 +28,28 @@ export function applyMerge(grid, row, col) {
           const neighbor = newGrid[nr][nc];
           if (neighbor === null) continue;
 
-          // ✅ Equal tiles
+          let merged = false;
+
           if (neighbor === value) {
             newGrid[r][c] = null;
             newGrid[nr][nc] = null;
             scoreGained += value * 2;
-            changed = true;
-            break;
-          }
-
-          // ✅ Divisible
-          if (value > neighbor && value % neighbor === 0) {
+            merged = true;
+          } else if (value > neighbor && value % neighbor === 0) {
             const result = value / neighbor;
-
             newGrid[r][c] = result === 1 ? null : result;
             newGrid[nr][nc] = null;
-
             scoreGained += result;
-            changed = true;
-            break;
-          }
-
-          if (neighbor > value && neighbor % value === 0) {
+            merged = true;
+          } else if (neighbor > value && neighbor % value === 0) {
             const result = neighbor / value;
-
             newGrid[nr][nc] = result === 1 ? null : result;
             newGrid[r][c] = null;
-
             scoreGained += result;
+            merged = true;
+          }
+
+          if (merged) {
             changed = true;
             break;
           }

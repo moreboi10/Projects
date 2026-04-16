@@ -7,9 +7,7 @@ export default function useGameState() {
   );
 
   const [queue, setQueue] = useState([2, 3, 4]);
-
   const [keepVal, setKeepVal] = useState(null);
-
   const [isGameOver, setIsGameOver] = useState(false);
 
   const [score, setScore] = useState(0);
@@ -18,11 +16,8 @@ export default function useGameState() {
   );
 
   const [undoStack, setUndoStack] = useState([]);
-
   const [level, setLevel] = useState(1);
   const [trashCount, setTrashCount] = useState(3);
-
-  const [hintsEnabled, setHintsEnabled] = useState(false);
 
   function getRandomTile() {
     const values = [13, 3, 11, 5, 7, 9];
@@ -64,7 +59,6 @@ export default function useGameState() {
         }
       }
     }
-
     return false;
   }
 
@@ -83,7 +77,7 @@ export default function useGameState() {
   }
 
   function placeTile(row, col) {
-    if (grid[row][col] !== null) return;
+    if (isGameOver || grid[row][col] !== null) return;
 
     const prevState = {
       grid: grid.map(r => [...r]),
@@ -101,7 +95,7 @@ export default function useGameState() {
     newGrid[row][col] = value;
 
     const { newGrid: mergedGrid, scoreGained } =
-      applyMerge(newGrid, row, col);
+     applyMerge(newGrid);
 
     setGrid(mergedGrid);
 
@@ -124,45 +118,44 @@ export default function useGameState() {
       setIsGameOver(true);
     }
 
-    const newQueue = [...queue.slice(1), getRandomTile()];
-    setQueue(newQueue);
+    setQueue(prev => [...prev.slice(1), getRandomTile()]);
   }
 
   function handleKeep() {
+    if (isGameOver) return;
+
     const current = queue[0];
 
     if (keepVal === null) {
       setKeepVal(current);
-      setQueue([...queue.slice(1), getRandomTile()]);
+      setQueue(prev => [...prev.slice(1), getRandomTile()]);
     } else {
-      const newQueue = [keepVal, ...queue.slice(1)];
+      setQueue(prev => [keepVal, ...prev.slice(1)]);
       setKeepVal(current);
-      setQueue(newQueue);
     }
   }
 
   function handleTrash() {
-    if (trashCount <= 0) return;
+    if (isGameOver || trashCount <= 0) return;
 
     setTrashCount(prev => prev - 1);
-    setQueue([...queue.slice(1), getRandomTile()]);
+    setQueue(prev => [...prev.slice(1), getRandomTile()]);
   }
 
   return {
-    grid, setGrid,
-    queue, setQueue,
-    keepVal, setKeepVal,
-    score, setScore,
-    bestScore, setBestScore,
-    undoStack, setUndoStack,
-    level, setLevel,
-    trashCount, setTrashCount,
-    hintsEnabled, setHintsEnabled,
+    grid,
+    queue,
+    keepVal,
+    score,
+    bestScore,
+    undoStack,
+    level,
+    trashCount,
+    isGameOver,
     placeTile,
     undo,
     handleKeep,
     handleTrash,
-    isGameOver,
     setIsGameOver,
   };
 }

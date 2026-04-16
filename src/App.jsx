@@ -25,6 +25,8 @@ function App() {
   const [hasStarted, setHasStarted] = useState(false);
 
   const handleRestart = () => {
+    setTime(0);
+    setHasStarted(false);
     window.location.reload();
   };
 
@@ -60,7 +62,7 @@ function App() {
 
       <div className="game-wrapper">
         <main className="grid-container">
-   <img src="/catimg.png" alt="cat" className="kawaii-cat" />
+          <img src="/catimg.png" alt="cat" className="kawaii-cat" />
           <div className="badge level-badge">LEVEL {level}</div>
           <div className="badge score-badge">SCORE {score}</div>
           <Grid grid={grid} placeTile={handleFirstMove} />
@@ -78,6 +80,7 @@ function App() {
           </div>
 
           <div className="panel-section">
+            <span className="panel-label">TRASH</span>
             <Trash handleTrash={handleTrash} trashCount={trashCount} />
           </div>
 
@@ -85,8 +88,6 @@ function App() {
             UNDO
           </button>
         </aside>
-
-        <div className="side-spacer"></div>
       </div>
 
       {isGameOver && (
